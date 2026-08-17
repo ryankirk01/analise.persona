@@ -60,6 +60,17 @@ const company=c==='a empresa'?'a empresa':c;
 const sectorName=q('#callSector')?.value||'Negócios locais';
 const who=person?person:'senhor';
 const hello=person?`Olá, ${person}.`:'Perfeito.';
+const principalOpen=`${greeting}, eu falo com um dos executivos da ${company}?`;
+const principalPermission=person
+ ?`Olá, ${person}. Me chamo Ryan Kirk, sou um dos representantes da empresa Babel. Eu só queria te fazer um simples questionamento.`
+ :`Olá. Me chamo Ryan Kirk, sou um dos representantes da empresa Babel. Eu só queria te fazer um simples questionamento.`;
+const principalQuestion=person
+ ?`Certo, ${person}. Se o senhor visse sua empresa trabalhando de forma automática e pensando por conta própria, qual seria a primeira coisa que ela iria resolver na sua empresa?`
+ :`Certo. Se o senhor visse sua empresa trabalhando de forma automática e pensando por conta própria, qual seria a primeira coisa que ela iria resolver na sua empresa?`;
+const principalMeaning=person
+ ?`Perfeito, senhor ${person}. Hoje a Babel é responsável por dar uma consciência para a sua empresa, e o grande propósito dela é não deixar faltar tempo nem dinheiro para o senhor.`
+ :`Perfeito. Hoje a Babel é responsável por dar uma consciência para a sua empresa, e o grande propósito dela é não deixar faltar tempo nem dinheiro para o senhor.`;
+const principalClose=`Gostaria de saber se o senhor consegue participar de uma reunião de no máximo 15 minutos referente à Babel entre hoje e amanhã?`;
 const humanOpen={
 'Executivo':`${greeting}, tudo bem? Eu falo com um dos executivos da ${company}?`,
 'Natural':`${greeting}, tudo bem? Eu consigo falar com alguém que conheça bem a operação da ${company}?`,
@@ -92,9 +103,9 @@ const intentClose={
 const pause='';
 return[
 {
- name:'01 · QUESTIONAMENTO DE FUTURO',
- why:'Baixa defesa → cria futuro mental → faz o decisor escolher a própria dor → conecta Babel a tempo e dinheiro',
- text:`${humanOpen}\n\n${permission}\n\nCerto, ${who}: se você visse a ${company} trabalhando de forma automática e pensando por conta própria, qual seria a primeira coisa que você gostaria que ela resolvesse?\n\nPerfeito. É justamente esse tipo de resposta que importa. ${intensityBridge} ${sectorBridge} No fim, o nosso propósito é simples: fazer sobrar mais tempo para quem está no comando e impedir que dinheiro escape porque uma ação ficou para depois.\n\n${intentClose}`
+ name:'01 · COPY PRINCIPAL · QUESTIONAMENTO DE FUTURO',
+ why:'Abertura genuína → curiosidade sem pitch → projeção mental da própria empresa → auto-diagnóstico → Babel conectada a tempo e dinheiro → reunião de 15 minutos',
+ text:`${principalOpen}\n\n${principalPermission}\n\n${principalQuestion}\n\n${principalMeaning}\n\n${principalClose}`
 },
 {
  name:'02 · A EMPRESA ACORDA SABENDO',
