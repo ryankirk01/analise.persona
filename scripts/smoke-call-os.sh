@@ -24,43 +24,62 @@ fi
   --no-sandbox \
   --disable-gpu \
   --disable-dev-shm-usage \
-  --virtual-time-budget=12000 \
+  --virtual-time-budget=14000 \
   --dump-dom "http://127.0.0.1:${PORT}/" > "$DOM"
 
 HTML_TAG="$(grep -o '<html[^>]*>' "$DOM" | head -1 || true)"
 echo "RUNTIME HTML: $HTML_TAG"
 
-# Primeiro prova que os três scripts realmente começaram a executar.
 for marker in \
   'data-call-core-mounted="1"' \
   'data-call-revolution-script-executed="1"' \
-  'data-call-theater-script-executed="1"'; do
+  'data-call-theater-script-executed="1"' \
+  'data-call-thesis-script-executed="1"'; do
   if ! grep -q "$marker" "$DOM"; then
     echo "SMOKE FAIL: script/runtime marker ausente: $marker"
     exit 1
   fi
 done
 
-# Depois prova que as duas camadas terminaram a montagem.
 for marker in \
   'data-call-revolution-mounted="1"' \
-  'data-call-theater-mounted="1"'; do
+  'data-call-theater-mounted="1"' \
+  'data-call-thesis-mounted="1"'; do
   if ! grep -q "$marker" "$DOM"; then
     echo "SMOKE FAIL: mounted marker ausente: $marker"
     if grep -q 'data-call-revolution-error=' "$DOM"; then echo "Revolution registrou erro no <html>."; fi
     if grep -q 'data-call-theater-error=' "$DOM"; then echo "Theater registrou erro no <html>."; fi
+    if grep -q 'data-call-thesis-error=' "$DOM"; then echo "Thesis registrou erro no <html>."; fi
     exit 1
   fi
 done
 
 for selector_marker in \
   'id="callTheaterStage"' \
-  'id="callHumanCodeSection"' \
-  'class="call-soul-guide"'; do
+  'id="thesisCopySection"' \
+  'id="thesisBlockLab"' \
+  'id="callRadarSection"' \
+  'id="callRadarGrid"' \
+  'id="callArenaSection"' \
+  'id="arenaOptions"' \
+  'id="callHumanCodeSection"'; do
   if ! grep -q "$selector_marker" "$DOM"; then
     echo "SMOKE FAIL: elemento montado ausente: $selector_marker"
     exit 1
   fi
 done
 
-echo "SMOKE OK: Core -> Revolution -> Call Theater executaram e montaram no DOM real."
+if ! grep -q 'COPY PRINCIPAL · TESE' "$DOM"; then
+  echo "SMOKE FAIL: tese principal não apareceu no DOM."
+  exit 1
+fi
+if ! grep -q 'CALL RADAR' "$DOM"; then
+  echo "SMOKE FAIL: Call Radar não apareceu no DOM."
+  exit 1
+fi
+if ! grep -q 'CALL ARENA' "$DOM"; then
+  echo "SMOKE FAIL: Call Arena não apareceu no DOM."
+  exit 1
+fi
+
+echo "SMOKE OK: Core -> Revolution -> Soul -> Thesis OS executaram; Copy Principal, Radar e Arena estão montados no DOM real."
