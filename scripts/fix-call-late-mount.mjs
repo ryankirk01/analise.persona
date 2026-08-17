@@ -15,10 +15,19 @@ const patchCore=()=>{
   console.log(`${path}: CORE READY event wired.`);
 };
 
-const patchLayer=(path,{scriptMarker,newTail})=>{
-  let source=fs.readFileSync(path,'utf8');
+const namespaceSelectors=(source,prefix)=>{
+  const declaration=/const \$=\(s,r=document\)=>r\.querySelector\(s\),\$\$=\(s,r=document\)=>\[\.\.\.r\.querySelectorAll\(s\)\];/;
+  if(declaration.test(source)){
+    source=source.replace(declaration,`const ${prefix}Q=(s,r=document)=>r.querySelector(s),${prefix}QQ=(s,r=document)=>[...r.querySelectorAll(s)];`);
+  }
+  source=source.replace(/\$\$\(/g,`${prefix}QQ(`).replace(/\$\(/g,`${prefix}Q(`);
+  return source;
+};
 
-  // Prova que o próprio <script> iniciou execução no browser.
+const patchLayer=(path,{scriptMarker,newTail,selectorPrefix})=>{
+  let source=fs.readFileSync(path,'utf8');
+  source=namespaceSelectors(source,selectorPrefix);
+
   if(!source.includes(scriptMarker)){
     const open='(()=>{';
     const at=source.indexOf(open);
@@ -31,19 +40,19 @@ const patchLayer=(path,{scriptMarker,newTail})=>{
   if(bootStart<0||iifeEnd<0||iifeEnd<=bootStart) throw new Error(`Boot/tail not found in ${path}`);
   source=source.slice(0,bootStart)+newTail+'\n'+source.slice(iifeEnd);
   fs.writeFileSync(path,source);
-  console.log(`${path}: deterministic readiness chain wired.`);
+  console.log(`${path}: namespaced selectors + deterministic readiness chain wired.`);
 };
 
 patchCore();
 
 patchLayer('scripts/call-os-revolution.fragment.html',{
   scriptMarker:'callRevolutionScriptExecuted',
+  selectorPrefix:'rev',
   newTail:`const boot=()=>{
  if(document.documentElement.dataset.callRevolutionMounted==='1')return true;
  try{
-  if(!$('.call-page'))return false;
-  // Se uma tentativa anterior ficou incompleta, remove somente a camada Revolution e reconstrói.
-  if($('#callRevAutopilotSection'))$$('.call-revolution-section').forEach(el=>el.remove());
+  if(!revQ('.call-page'))return false;
+  if(revQ('#callRevAutopilotSection'))revQQ('.call-revolution-section').forEach(el=>el.remove());
   const ok=enhance();
   if(!ok)return false;
   document.documentElement.dataset.callRevolutionMounted='1';
@@ -58,24 +67,25 @@ patchLayer('scripts/call-os-revolution.fragment.html',{
 };
 const onCoreReady=()=>boot();
 document.addEventListener('babel-call-core-ready',onCoreReady);
-if($('.call-page'))queueMicrotask(onCoreReady);
+if(revQ('.call-page'))queueMicrotask(onCoreReady);
 window.addEventListener('load',onCoreReady,{once:true});`
 });
 
 patchLayer('scripts/call-soul-theater.fragment.html',{
   scriptMarker:'callTheaterScriptExecuted',
+  selectorPrefix:'soul',
   newTail:`const boot=()=>{
  if(document.documentElement.dataset.callTheaterMounted==='1')return true;
  try{
-  const ready=$('#callRevAutopilotSection')&&$('#callScripts');
+  const ready=soulQ('#callRevAutopilotSection')&&soulQ('#callScripts');
   if(!ready)return false;
   mountTheater();
   humanSection();
   annotateScripts();
-  if(!$('#callTheaterStage')||!$('#callHumanCodeSection')||!$('.call-soul-guide'))return false;
+  if(!soulQ('#callTheaterStage')||!soulQ('#callHumanCodeSection')||!soulQ('.call-soul-guide'))return false;
   document.documentElement.dataset.callTheaterMounted='1';
   delete document.documentElement.dataset.callTheaterError;
-  const root=$('#callScripts');
+  const root=soulQ('#callScripts');
   if(root&&!root.dataset.soulObserved){
    root.dataset.soulObserved='1';
    const scriptsObserver=new MutationObserver(()=>{
@@ -86,10 +96,10 @@ patchLayer('scripts/call-soul-theater.fragment.html',{
   }
   if(!document.documentElement.dataset.soulControlsBound){
    document.documentElement.dataset.soulControlsBound='1';
-   ['callCompany','callPerson','callSector','callTone','callIntent','callIntensity'].forEach(id=>$('#'+id)?.addEventListener('change',()=>setTimeout(()=>{
+   ['callCompany','callPerson','callSector','callTone','callIntent','callIntensity'].forEach(id=>soulQ('#'+id)?.addEventListener('change',()=>setTimeout(()=>{
     annotateScripts();theater.dialogue=buildDialogue(theater.script);theater.turn=0;renderTheater();
    },70)));
-   $('#callGenerate')?.addEventListener('click',()=>setTimeout(annotateScripts,90));
+   soulQ('#callGenerate')?.addEventListener('click',()=>setTimeout(annotateScripts,90));
   }
   return true;
  }catch(err){
@@ -100,6 +110,6 @@ patchLayer('scripts/call-soul-theater.fragment.html',{
 };
 const onRevolutionReady=()=>boot();
 document.addEventListener('babel-call-revolution-ready',onRevolutionReady);
-if($('#callRevAutopilotSection'))queueMicrotask(onRevolutionReady);
+if(soulQ('#callRevAutopilotSection'))queueMicrotask(onRevolutionReady);
 window.addEventListener('load',onRevolutionReady,{once:true});`
 });
