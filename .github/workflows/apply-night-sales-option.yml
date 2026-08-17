@@ -11,6 +11,7 @@ on:
       - 'scripts/upgrade-call-copy-v4.mjs'
       - 'scripts/fix-call-late-mount.mjs'
       - 'scripts/smoke-call-os.sh'
+      - 'scripts/validate-call-js.mjs'
       - '.github/workflows/apply-night-sales-option.yml'
 
 permissions:
@@ -28,6 +29,8 @@ jobs:
         run: node scripts/upgrade-call-copy-v4.mjs
       - name: Make Call Intelligence mount whenever LIGAR opens
         run: node scripts/fix-call-late-mount.mjs
+      - name: Validate Core + Revolution + Soul JavaScript syntax
+        run: node scripts/validate-call-js.mjs
       - name: Rebuild compressed page with Call Intelligence Soul OS
         run: node scripts/patch-night-sales.mjs
       - name: Browser smoke test — Call Theater must actually render
@@ -43,5 +46,5 @@ jobs:
             echo 'No generated changes.'
             exit 0
           fi
-          git commit -m 'fix: publish browser-verified Call Theater'
+          git commit -m 'fix: publish runtime-verified Call Theater'
           git push origin HEAD:main
