@@ -24,21 +24,35 @@ fi
   --no-sandbox \
   --disable-gpu \
   --disable-dev-shm-usage \
-  --virtual-time-budget=10000 \
+  --virtual-time-budget=12000 \
   --dump-dom "http://127.0.0.1:${PORT}/" > "$DOM"
 
-# Estes atributos só surgem depois que o JavaScript executa e monta os módulos.
+HTML_TAG="$(grep -o '<html[^>]*>' "$DOM" | head -1 || true)"
+echo "RUNTIME HTML: $HTML_TAG"
+
+# Primeiro prova que os três scripts realmente começaram a executar.
 for marker in \
-  'data-call-revolution-mounted="1"' \
-  'data-call-theater-mounted="1"'; do
+  'data-call-core-mounted="1"' \
+  'data-call-revolution-script-executed="1"' \
+  'data-call-theater-script-executed="1"'; do
   if ! grep -q "$marker" "$DOM"; then
-    echo "SMOKE FAIL: runtime marker ausente: $marker"
-    grep -o '<html[^>]*>' "$DOM" | head -1 || true
+    echo "SMOKE FAIL: script/runtime marker ausente: $marker"
     exit 1
   fi
 done
 
-# Prova adicional de que os elementos montados existem no DOM final.
+# Depois prova que as duas camadas terminaram a montagem.
+for marker in \
+  'data-call-revolution-mounted="1"' \
+  'data-call-theater-mounted="1"'; do
+  if ! grep -q "$marker" "$DOM"; then
+    echo "SMOKE FAIL: mounted marker ausente: $marker"
+    if grep -q 'data-call-revolution-error=' "$DOM"; then echo "Revolution registrou erro no <html>."; fi
+    if grep -q 'data-call-theater-error=' "$DOM"; then echo "Theater registrou erro no <html>."; fi
+    exit 1
+  fi
+done
+
 for selector_marker in \
   'id="callTheaterStage"' \
   'id="callHumanCodeSection"' \
@@ -49,4 +63,4 @@ for selector_marker in \
   fi
 done
 
-echo "SMOKE OK: Revolution + Call Theater + Código Humano + Autoentendimento executaram e montaram no DOM real."
+echo "SMOKE OK: Core -> Revolution -> Call Theater executaram e montaram no DOM real."
