@@ -9,7 +9,8 @@
 </style>
 <script id="babelCallSoulModule">
 (()=>{
-const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+document.documentElement.dataset.callTheaterScriptExecuted='1';
+const soulQ=(s,r=document)=>r.querySelector(s),soulQQ=(s,r=document)=>[...r.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 const theater={script:0,turn:0,playing:false,dialogue:[],voices:[],timer:null};
 const sectorProspect={
@@ -72,8 +73,8 @@ const scriptDoctrine=[
  ['CONTINUIDADE','Convidar para aplicar o conceito à empresa real.','A reunião vira teste da tese.','Hoje ou amanhã, ou uma pergunta técnica.','Se houver pergunta técnica, responda antes de voltar ao CTA.']]
 }
 ];
-const currentContext=()=>({company:$('#callCompany')?.value.trim()||'a empresa',person:$('#callPerson')?.value.trim()||'o decisor',sector:$('#callSector')?.value||'Negócios locais'});
-const getBlocks=()=>$$('#callScripts .call-script-block');
+const currentContext=()=>({company:soulQ('#callCompany')?.value.trim()||'a empresa',person:soulQ('#callPerson')?.value.trim()||'o decisor',sector:soulQ('#callSector')?.value||'Negócios locais'});
+const getBlocks=()=>soulQQ('#callScripts .call-script-block');
 const getParagraphs=i=>{const b=getBlocks()[i];return(b?.querySelector('.call-script-text')?.textContent||'').split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean)};
 const buildDialogue=i=>{
  const p=getParagraphs(i),ctx=currentContext(),reply=sectorProspect[ctx.sector]||sectorProspect['Negócios locais'];
@@ -94,15 +95,15 @@ const buildDialogue=i=>{
 const loadVoices=()=>{if(!('speechSynthesis'in window))return;theater.voices=speechSynthesis.getVoices();};
 loadVoices();if('speechSynthesis'in window)speechSynthesis.addEventListener?.('voiceschanged',loadVoices);
 const voiceFor=speaker=>{const pt=theater.voices.filter(v=>/^pt(-|_)/i.test(v.lang)||/Portugu/i.test(v.name));if(!pt.length)return theater.voices[0]||null;if(speaker==='RYAN')return pt[0];return pt[1]||pt[0]};
-const renderTheaterMind=turn=>{const root=$('#callTheaterMind');if(!root)return;root.innerHTML=`<div class="call-mind-kicker">O QUE ESTÁ ACONTECENDO AGORA</div><div class="call-mind-title">${esc(turn?.stage||'Prepare a conversa')}</div><div class="call-mind-item"><b>POR QUE ESTA FALA EXISTE</b><span>${esc(turn?.why||'Escolha um script e inicie a simulação.')}</span></div><div class="call-mind-item"><b>O QUE PODE ESTAR ACONTECENDO DO OUTRO LADO</b><span>${esc(turn?.feel||'—')}</span></div><div class="call-mind-item"><b>O QUE VOCÊ PRECISA OBSERVAR</b><span>${esc(turn?.watch||'—')}</span></div><div class="call-mind-item"><b>REGRA HUMANA</b><span><strong>${esc(turn?.human||'Escute antes de conduzir.')}</strong></span></div>`};
-const renderTranscript=()=>{const root=$('#callTheaterTranscript');if(!root)return;root.innerHTML=theater.dialogue.map((t,i)=>`<div class="call-dialogue-row ${t.speaker==='RYAN'?'ryan':''} ${i===theater.turn?'active':''} ${i<theater.turn?'done':''}" data-dialogue="${i}"><div class="call-dialogue-speaker">${esc(t.speaker)}</div><div class="call-dialogue-text">${esc(t.text)}</div></div>`).join('');root.querySelector('.active')?.scrollIntoView({block:'nearest'})};
+const renderTheaterMind=turn=>{const root=soulQ('#callTheaterMind');if(!root)return;root.innerHTML=`<div class="call-mind-kicker">O QUE ESTÁ ACONTECENDO AGORA</div><div class="call-mind-title">${esc(turn?.stage||'Prepare a conversa')}</div><div class="call-mind-item"><b>POR QUE ESTA FALA EXISTE</b><span>${esc(turn?.why||'Escolha um script e inicie a simulação.')}</span></div><div class="call-mind-item"><b>O QUE PODE ESTAR ACONTECENDO DO OUTRO LADO</b><span>${esc(turn?.feel||'—')}</span></div><div class="call-mind-item"><b>O QUE VOCÊ PRECISA OBSERVAR</b><span>${esc(turn?.watch||'—')}</span></div><div class="call-mind-item"><b>REGRA HUMANA</b><span><strong>${esc(turn?.human||'Escute antes de conduzir.')}</strong></span></div>`};
+const renderTranscript=()=>{const root=soulQ('#callTheaterTranscript');if(!root)return;root.innerHTML=theater.dialogue.map((t,i)=>`<div class="call-dialogue-row ${t.speaker==='RYAN'?'ryan':''} ${i===theater.turn?'active':''} ${i<theater.turn?'done':''}" data-dialogue="${i}"><div class="call-dialogue-speaker">${esc(t.speaker)}</div><div class="call-dialogue-text">${esc(t.text)}</div></div>`).join('');root.querySelector('.active')?.scrollIntoView({block:'nearest'})};
 const renderTheater=()=>{
  const p=getParagraphs(theater.script);const turn=theater.dialogue[theater.turn];
- const line=$('#callTheaterLine'),speaker=$('#callTheaterSpeaker'),avatar=$('#callTheaterAvatar'),stage=$('#callTheaterStage');
+ const line=soulQ('#callTheaterLine'),speaker=soulQ('#callTheaterSpeaker'),avatar=soulQ('#callTheaterAvatar'),stage=soulQ('#callTheaterStage');
  if(!line)return;
  if(!p.length){line.textContent='Gere os scripts acima para iniciar a simulação.';return}
  line.textContent=turn?.text||'Pronto para começar.';speaker.textContent=turn?.speaker||'BABEL';speaker.classList.toggle('prospect',turn?.speaker==='PROSPECT');avatar.textContent=turn?.speaker==='PROSPECT'?'P':'RK';avatar.classList.toggle('prospect',turn?.speaker==='PROSPECT');stage.classList.toggle('playing',theater.playing);renderTheaterMind(turn);renderTranscript();
- $$('.call-theater-tab').forEach((b,i)=>b.classList.toggle('active',i===theater.script));
+ soulQQ('.call-theater-tab').forEach((b,i)=>b.classList.toggle('active',i===theater.script));
 };
 const speakTurn=()=>{
  if(!theater.playing)return;
@@ -117,15 +118,15 @@ const startTheater=()=>{clearTimeout(theater.timer);if('speechSynthesis'in windo
 const pauseTheater=()=>{theater.playing=false;clearTimeout(theater.timer);if('speechSynthesis'in window)speechSynthesis.cancel();renderTheater()};
 const setTheaterScript=i=>{pauseTheater();theater.script=i;theater.turn=0;theater.dialogue=buildDialogue(i);renderTheater()};
 const mountTheater=()=>{
- const sec=$('#callRevAutopilotSection');if(!sec)return false;
+ const sec=soulQ('#callRevAutopilotSection');if(!sec)return false;
  sec.classList.add('call-soul-section');sec.innerHTML=`<div class="call-section-head"><div><div class="call-section-num">00 · CALL THEATER</div><h2>Ouça a ligação antes de fazê-la.</h2></div><p class="call-section-desc">Uma simulação de treinamento transforma roteiro em experiência. O navegador interpreta Ryan e prospect com voz sintetizada quando disponível, enquanto a página mostra explicitamente o propósito humano de cada fala.</p></div><div class="call-rev-hero"><div class="call-rev-kicker">SIMULAÇÃO DE TREINAMENTO · NÃO É UMA GRAVAÇÃO REAL</div><h3>Entre na conversa antes de entrar no telefone.</h3><p>Não memorize palavras. Observe ritmo, permissão, silêncio, reação e significado. O objetivo do teatro é fazer você entender a estrutura até conseguir conduzi-la sem depender do texto.</p></div><div class="call-theater-tabs">${[1,2,3,4,5].map((n,i)=>`<button class="call-theater-tab ${i===0?'active':''}" data-theater-script="${i}">SCRIPT ${n}</button>`).join('')}</div><div class="call-theater-shell"><div><div class="call-theater-stage" id="callTheaterStage"><div class="call-theater-head"><div class="call-theater-status"><i></i><span>CALL THEATER · BABEL ↔ PROSPECT</span></div><div class="call-theater-disclaimer">Voz sintetizada pelo navegador · treinamento</div></div><div class="call-theater-phone"><div><div class="call-theater-now"><div class="call-avatar" id="callTheaterAvatar">RK</div><div><div class="call-theater-speaker" id="callTheaterSpeaker">BABEL</div><div class="call-theater-line" id="callTheaterLine">Pronto para iniciar.</div><div class="call-theater-wave">${'<span></span>'.repeat(22)}</div></div></div></div><div class="call-theater-controls"><button class="call-theater-btn primary" id="callTheaterPlay">▶ SIMULAR COM ÁUDIO</button><button class="call-theater-btn" id="callTheaterPause">PAUSAR</button><button class="call-theater-btn" id="callTheaterNext">PRÓXIMA FALA</button><button class="call-theater-btn" id="callTheaterReset">REINICIAR</button></div></div></div><div class="call-theater-transcript" id="callTheaterTranscript"></div></div><aside class="call-theater-mind" id="callTheaterMind"></aside></div><div class="call-preflight" style="margin-top:14px"><div class="call-preflight-item"><b>ANTES DE FALAR</b><span>Saiba quem você quer e qual reação pretende provocar.</span></div><div class="call-preflight-item"><b>ENQUANTO FALA</b><span>Escute mudança de tom, pausa e palavras espontâneas.</span></div><div class="call-preflight-item"><b>DEPOIS DA PERGUNTA</b><span>Não complete o pensamento do prospect. Dê espaço.</span></div><div class="call-preflight-item"><b>QUANDO BABEL ENTRA</b><span>Somente depois de existir contexto fornecido pelo outro.</span></div><div class="call-preflight-item"><b>ÚNICO OBJETIVO</b><span>Conquistar uma próxima conversa que mereça acontecer.</span></div>`;
- $$('.call-theater-tab').forEach(b=>b.addEventListener('click',()=>setTheaterScript(Number(b.dataset.theaterScript))));
- $('#callTheaterPlay')?.addEventListener('click',startTheater);$('#callTheaterPause')?.addEventListener('click',pauseTheater);$('#callTheaterNext')?.addEventListener('click',()=>{pauseTheater();theater.turn=Math.min(theater.dialogue.length-1,theater.turn+1);renderTheater()});$('#callTheaterReset')?.addEventListener('click',()=>{pauseTheater();theater.turn=0;renderTheater()});
+ soulQQ('.call-theater-tab').forEach(b=>b.addEventListener('click',()=>setTheaterScript(Number(b.dataset.theaterScript))));
+ soulQ('#callTheaterPlay')?.addEventListener('click',startTheater);soulQ('#callTheaterPause')?.addEventListener('click',pauseTheater);soulQ('#callTheaterNext')?.addEventListener('click',()=>{pauseTheater();theater.turn=Math.min(theater.dialogue.length-1,theater.turn+1);renderTheater()});soulQ('#callTheaterReset')?.addEventListener('click',()=>{pauseTheater();theater.turn=0;renderTheater()});
  theater.dialogue=buildDialogue(0);renderTheater();return true;
 };
 const humanSection=()=>{
- if($('#callHumanCodeSection'))return;
- const scripts=$('#callScripts')?.closest('.call-section');if(!scripts)return;
+ if(soulQ('#callHumanCodeSection'))return;
+ const scripts=soulQ('#callScripts')?.closest('.call-section');if(!scripts)return;
  const sec=document.createElement('section');sec.className='call-section call-soul-section';sec.id='callHumanCodeSection';sec.innerHTML=`<div class="call-section-head"><div><div class="call-section-num">01 · CÓDIGO HUMANO</div><h2>Venda forte sem perder humanidade.</h2></div><p class="call-section-desc">Persuasão sustentável não nasce de pressionar uma pessoa. Nasce de atenção, clareza, curiosidade, verdade e respeito à autonomia. Esses princípios ficam visíveis para que o vendedor aprenda a estrutura — não apenas as palavras.</p></div><div class="call-code-human"><div class="call-human-law"><strong>VERDADE &gt; TEATRO</strong><span>Não invente intimidade, urgência ou resultado. Autoridade cresce quando a linguagem aguenta perguntas.</span></div><div class="call-human-law"><strong>CURIOSIDADE &gt; EXPLICAÇÃO</strong><span>Antes de explicar Babel, faça a pessoa pensar na própria empresa.</span></div><div class="call-human-law"><strong>ESCUTA &gt; ELOQUÊNCIA</strong><span>A resposta do prospect vale mais que a próxima frase perfeita do roteiro.</span></div><div class="call-human-law"><strong>AUTONOMIA &gt; PRESSÃO</strong><span>Hoje ou amanhã facilita agenda; nunca deve impedir a pessoa de dizer não.</span></div><div class="call-human-law"><strong>SIGNIFICADO &gt; FUNÇÃO</strong><span>Não venda automação como lista de recursos. Conecte tecnologia ao tempo, dinheiro e liberdade operacional.</span></div></div><div class="call-human-manifesto">Uma grande cold call não faz alguém se sentir <b>encurralado.</b> Ela faz alguém se sentir <b>compreendido o suficiente para querer continuar pensando.</b></div>`;scripts.parentNode.insertBefore(sec,scripts);
 };
 const stageGuidesFor=(scriptIndex,paragraphs)=>{
@@ -139,11 +140,17 @@ const annotateScripts=()=>{
  theater.dialogue=buildDialogue(theater.script);theater.turn=Math.min(theater.turn,Math.max(0,theater.dialogue.length-1));renderTheater();
 };
 const boot=()=>{
- const initialize=()=>{
-  const ready=$('#callRevAutopilotSection')&&$('#callScripts');
+ if(document.documentElement.dataset.callTheaterMounted==='1')return true;
+ try{
+  const ready=soulQ('#callRevAutopilotSection')&&soulQ('#callScripts');
   if(!ready)return false;
-  mountTheater();humanSection();annotateScripts();
-  const root=$('#callScripts');
+  mountTheater();
+  humanSection();
+  annotateScripts();
+  if(!soulQ('#callTheaterStage')||!soulQ('#callHumanCodeSection')||!soulQ('.call-soul-guide'))return false;
+  document.documentElement.dataset.callTheaterMounted='1';
+  delete document.documentElement.dataset.callTheaterError;
+  const root=soulQ('#callScripts');
   if(root&&!root.dataset.soulObserved){
    root.dataset.soulObserved='1';
    const scriptsObserver=new MutationObserver(()=>{
@@ -154,25 +161,21 @@ const boot=()=>{
   }
   if(!document.documentElement.dataset.soulControlsBound){
    document.documentElement.dataset.soulControlsBound='1';
-   ['callCompany','callPerson','callSector','callTone','callIntent','callIntensity'].forEach(id=>$('#'+id)?.addEventListener('change',()=>setTimeout(()=>{
+   ['callCompany','callPerson','callSector','callTone','callIntent','callIntensity'].forEach(id=>soulQ('#'+id)?.addEventListener('change',()=>setTimeout(()=>{
     annotateScripts();theater.dialogue=buildDialogue(theater.script);theater.turn=0;renderTheater();
    },70)));
-   $('#callGenerate')?.addEventListener('click',()=>setTimeout(annotateScripts,90));
+   soulQ('#callGenerate')?.addEventListener('click',()=>setTimeout(annotateScripts,90));
   }
   return true;
- };
- if(initialize())return;
- let scheduled=false;
- const observer=new MutationObserver(()=>{
-  if(scheduled)return;
-  scheduled=true;
-  requestAnimationFrame(()=>{
-   scheduled=false;
-   if(initialize())observer.disconnect();
-  });
- });
- observer.observe(document.documentElement,{childList:true,subtree:true});
+ }catch(err){
+  document.documentElement.dataset.callTheaterError=String(err?.message||err).slice(0,180);
+  console.error('BABEL CALL THEATER RUNTIME ERROR',err);
+  return false;
+ }
 };
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,0),{once:true});else setTimeout(boot,0);
+const onRevolutionReady=()=>boot();
+document.addEventListener('babel-call-revolution-ready',onRevolutionReady);
+if(soulQ('#callRevAutopilotSection'))queueMicrotask(onRevolutionReady);
+window.addEventListener('load',onRevolutionReady,{once:true});
 })();
 </script>
