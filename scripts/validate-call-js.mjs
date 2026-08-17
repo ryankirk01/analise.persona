@@ -5,7 +5,8 @@ const files=[
   'scripts/call-os-v2.fragment.html',
   'scripts/call-os-revolution.fragment.html',
   'scripts/call-soul-theater.fragment.html',
-  'scripts/call-thesis-os.fragment.html'
+  'scripts/call-thesis-os.fragment.html',
+  'scripts/call-focus-os.fragment.html'
 ];
 
 let failed=false;
