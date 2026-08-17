@@ -3,6 +3,7 @@ name: apply-call-os
 on:
   push:
     paths:
+      - 'digital.html'
       - 'scripts/patch-night-sales.mjs'
       - 'scripts/call-os-v2.fragment.html'
       - 'scripts/call-os-revolution.fragment.html'
@@ -15,6 +16,7 @@ on:
       - 'scripts/upgrade-call-copy-v4.mjs'
       - 'scripts/fix-call-late-mount.mjs'
       - 'scripts/smoke-call-os.sh'
+      - 'scripts/smoke-digital-market.sh'
       - 'scripts/validate-call-js.mjs'
       - '.github/workflows/apply-night-sales-option.yml'
 
@@ -35,10 +37,12 @@ jobs:
         run: node scripts/fix-call-late-mount.mjs
       - name: Validate all Call OS JavaScript syntax
         run: node scripts/validate-call-js.mjs
-      - name: Rebuild compressed page with Ego Focus and Deep Radar
+      - name: Rebuild compressed page with Digital Market portal
         run: node scripts/patch-night-sales.mjs
-      - name: Browser smoke test — four sections, Ego and Deep Radar must mount
+      - name: Browser smoke test — Call OS
         run: bash scripts/smoke-call-os.sh
+      - name: Browser smoke test — Mercado Digital 40 companies
+        run: bash scripts/smoke-digital-market.sh
       - name: Commit canonical source and generated page
         shell: bash
         run: |
@@ -50,5 +54,5 @@ jobs:
             echo 'No generated changes.'
             exit 0
           fi
-          git commit -m 'feat: publish deep digital physical Call Radar'
+          git commit -m 'feat: publish Mercado Digital portal and market intelligence'
           git push origin HEAD:main
