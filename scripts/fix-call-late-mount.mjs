@@ -4,13 +4,14 @@ const patchCore=()=>{
   const path='scripts/call-os-v2.fragment.html';
   let source=fs.readFileSync(path,'utf8');
 
-  source=source
-    .replace(/document\.documentElement\.dataset\.callCoreMounted='1';/g,'')
-    .replace(/setTimeout\(\(\)=>document\.dispatchEvent\(new CustomEvent\('babel-call-core-ready'\)\),0\);/g,'');
+  if(source.includes("dataset.callCoreMounted='1'")&&source.includes("new CustomEvent('babel-call-core-ready')")){
+    console.log(`${path}: CORE READY event already wired.`);
+    return;
+  }
 
-  const needle='objections();generate();renderHistory();};';
+  const needle='objections();generate();renderHistory();';
   if(!source.includes(needle)) throw new Error('Core completion point not found.');
-  source=source.replace(needle,`objections();generate();renderHistory();\n document.documentElement.dataset.callCoreMounted='1';\n setTimeout(()=>document.dispatchEvent(new CustomEvent('babel-call-core-ready')),0);\n};`);
+  source=source.replace(needle,`${needle}\n document.documentElement.dataset.callCoreMounted='1';\n setTimeout(()=>document.dispatchEvent(new CustomEvent('babel-call-core-ready')),0);`);
   fs.writeFileSync(path,source);
   console.log(`${path}: CORE READY event wired.`);
 };
