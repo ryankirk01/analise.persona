@@ -27,6 +27,8 @@ html=html
   .replace(/<script id="babelCallEgoModule">[\s\S]*?<\/script>/g,'')
   .replace(/<style id="babelCallRadarDeepStyles">[\s\S]*?<\/style>/g,'')
   .replace(/<script id="babelCallRadarDeepModule">[\s\S]*?<\/script>/g,'')
+  .replace(/<style id="babelDigitalPortalStyles">[\s\S]*?<\/style>/g,'')
+  .replace(/<a id="babelDigitalPortal"[\s\S]*?<\/a>/g,'')
   .replace(/<style id="babelBuildStampStyles">[\s\S]*?<\/style>/g,'')
   .replace(/<script id="babelBuildStampModule">[\s\S]*?<\/script>/g,'')
   .replace(/<script id="babelCallRuntimeGuard">[\s\S]*?<\/script>/g,'');
@@ -46,21 +48,17 @@ if(!focus.includes('babelCallFocusModule')||!focus.includes('babelCallFocusStyle
 if(!ego.includes('babelCallEgoModule')||!ego.includes('babelCallEgoStyles')) throw new Error('Ego Revolution Layer inválida.');
 if(!radarDeep.includes('babelCallRadarDeepModule')||!radarDeep.includes('babelCallRadarDeepStyles')) throw new Error('Deep Call Radar Layer inválida.');
 
+const portal=`<style id="babelDigitalPortalStyles">#babelDigitalPortal{position:fixed;top:16px;left:16px;z-index:2147483644;display:inline-flex;align-items:center;gap:8px;padding:10px 13px;border:1px solid rgba(190,92,255,.28);border-radius:999px;background:rgba(8,3,12,.78);backdrop-filter:blur(16px);box-shadow:0 10px 42px rgba(108,24,163,.18);color:#d8a8ff;text-decoration:none;font:900 7px/1 Inter,system-ui;letter-spacing:.12em;text-transform:uppercase;transition:.18s}#babelDigitalPortal:before{content:'';width:7px;height:7px;border-radius:50%;background:#bb50ff;box-shadow:0 0 18px #bb50ff}#babelDigitalPortal:hover{transform:translateY(-1px);border-color:rgba(205,119,255,.55);color:#fff;box-shadow:0 15px 55px rgba(125,33,190,.28)}@media(max-width:700px){#babelDigitalPortal{top:10px;left:10px;padding:8px 10px;font-size:6px}}</style><a id="babelDigitalPortal" href="/digital.html" aria-label="Abrir Mercado Digital">MERCADO DIGITAL</a>`;
 const runtimeGuard=`<script id="babelCallRuntimeGuard">(()=>{document.documentElement.dataset.callRuntimeGuard='1';window.addEventListener('error',e=>{const msg=String(e.message||e.error?.message||'browser error').slice(0,180);document.documentElement.dataset.callGlobalError=msg;document.documentElement.dataset.callGlobalErrorSource=String(e.filename||'inline').slice(-80);document.documentElement.dataset.callGlobalErrorLine=String(e.lineno||0)});window.addEventListener('unhandledrejection',e=>{document.documentElement.dataset.callUnhandledRejection=String(e.reason?.message||e.reason||'rejection').slice(0,180)})})();</script>`;
-
 const stamp=`<style id="babelBuildStampStyles">#babelBuildStamp{display:inline-flex;align-items:center;gap:6px;margin-left:8px;padding:5px 8px;border:1px solid rgba(88,241,159,.14);border-radius:999px;background:rgba(88,241,159,.04);color:#739181;font:800 7px/1 Inter,system-ui;letter-spacing:.1em;text-transform:uppercase}#babelBuildStamp b{color:#baffd4}</style><script id="babelBuildStampModule">(()=>{const add=()=>{if(document.getElementById('babelBuildStamp'))return true;const host=document.querySelector('.call-brand,.call-top-title,.call-state');if(!host)return false;const el=document.createElement('span');el.id='babelBuildStamp';el.innerHTML='<b>EGO FOCUS</b> · BUILD ${buildVersion}';host.appendChild(el);return true};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{let n=0;const t=setInterval(()=>{if(add()||++n>80)clearInterval(t)},100)},{once:true});else{let n=0;const t=setInterval(()=>{if(add()||++n>80)clearInterval(t)},100)}})();</script>`;
 
-const fragment=runtimeGuard+'\n'+core+'\n'+revolution+'\n'+soul+'\n'+thesis+'\n'+focus+'\n'+ego+'\n'+radarDeep+'\n'+stamp;
+const fragment=portal+'\n'+runtimeGuard+'\n'+core+'\n'+revolution+'\n'+soul+'\n'+thesis+'\n'+focus+'\n'+ego+'\n'+radarDeep+'\n'+stamp;
 html=html.replace('</body>',fragment+'\n</body>');
 
 const out=zlib.gzipSync(Buffer.from(html,'utf8'),{level:9}).toString('base64');
 if(out.length<=48000) throw new Error('Payload inesperadamente menor que 48k; loader exige seis blocos de 8000.');
-
 for(let i=0;i<6;i++) fs.writeFileSync(chunkFiles[i],out.slice(i*8000,(i+1)*8000));
 const tail=out.slice(48000);
-const nextLoader=loader
-  .replace(/const tail='[^']*'/,`const tail='${tail}'`)
-  .replace(/\?v=[A-Za-z0-9_-]+/g,`?v=${buildVersion}`);
+const nextLoader=loader.replace(/const tail='[^']*'/,`const tail='${tail}'`).replace(/\?v=[A-Za-z0-9_-]+/g,`?v=${buildVersion}`);
 fs.writeFileSync('index.html',nextLoader);
-
-console.log(`Call Ego Focus + Deep Radar applied. build=${buildVersion} HTML=${html.length} gzip-base64=${out.length} tail=${tail.length}`);
+console.log(`Call Ego Focus + Deep Radar + Digital Portal applied. build=${buildVersion} HTML=${html.length} gzip-base64=${out.length} tail=${tail.length}`);
