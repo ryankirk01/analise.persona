@@ -3,7 +3,22 @@ set -euo pipefail
 PORT=4174
 LOG=/tmp/babel-digital-http.log
 DOM=/tmp/babel-digital-dom.html
-python3 -m http.server "$PORT" --bind 127.0.0.1 >"$LOG" 2>&1 &
+ROOT=/tmp/babel-digital-smoke-root
+rm -rf "$ROOT"
+mkdir -p "$ROOT/scripts"
+cp digital.html "$ROOT/digital.html"
+cp scripts/digital-market-data.js "$ROOT/scripts/digital-market-data.js"
+cp scripts/digital-market.js "$ROOT/scripts/digital-market.js"
+# Smoke mode preserves all synchronous rendering but stops recurring visual loops after their first frame.
+python3 - <<'PY'
+from pathlib import Path
+p=Path('/tmp/babel-digital-smoke-root/digital.html')
+s=p.read_text()
+boot="""<script>if(new URLSearchParams(location.search).has('smoke')){window.requestAnimationFrame=()=>0;window.setInterval=(fn)=>{fn();return 0}}</script>"""
+s=s.replace('</head>',boot+'\n</head>')
+p.write_text(s)
+PY
+python3 -m http.server "$PORT" --bind 127.0.0.1 --directory "$ROOT" >"$LOG" 2>&1 &
 SERVER_PID=$!
 trap 'kill "$SERVER_PID" >/dev/null 2>&1 || true' EXIT
 sleep 1
@@ -12,7 +27,7 @@ for candidate in google-chrome-stable google-chrome chromium chromium-browser; d
   if command -v "$candidate" >/dev/null 2>&1; then CHROME="$candidate"; break; fi
 done
 if [[ -z "$CHROME" ]]; then echo "Chrome/Chromium não encontrado."; exit 1; fi
-"$CHROME" --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage --virtual-time-budget=10000 --dump-dom "http://127.0.0.1:${PORT}/digital.html" > "$DOM"
+timeout 30s "$CHROME" --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage --virtual-time-budget=2000 --dump-dom "http://127.0.0.1:${PORT}/digital.html?smoke=1" > "$DOM"
 
 for marker in \
   'BABEL · DIGITAL ECONOMY INTELLIGENCE' \
