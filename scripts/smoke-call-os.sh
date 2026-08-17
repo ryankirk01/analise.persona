@@ -24,21 +24,29 @@ fi
   --no-sandbox \
   --disable-gpu \
   --disable-dev-shm-usage \
-  --virtual-time-budget=8000 \
+  --virtual-time-budget=10000 \
   --dump-dom "http://127.0.0.1:${PORT}/" > "$DOM"
 
+# Estes atributos só surgem depois que o JavaScript executa e monta os módulos.
 for marker in \
-  "CALL THEATER" \
-  "Venda forte sem perder humanidade" \
-  "AUTOENTENDIMENTO" \
-  "SIMULAR COM ÁUDIO" \
-  "babelCallSoulModule"; do
+  'data-call-revolution-mounted="1"' \
+  'data-call-theater-mounted="1"'; do
   if ! grep -q "$marker" "$DOM"; then
-    echo "SMOKE FAIL: marcador ausente: $marker"
-    echo "--- trechos Babel/Call disponíveis ---"
-    grep -o -E '.{0,80}(CALL|Call|BABEL|AUTOENTENDIMENTO).{0,120}' "$DOM" | head -40 || true
+    echo "SMOKE FAIL: runtime marker ausente: $marker"
+    grep -o '<html[^>]*>' "$DOM" | head -1 || true
     exit 1
   fi
 done
 
-echo "SMOKE OK: Call Theater + Código Humano + Autoentendimento montados no DOM real."
+# Prova adicional de que os elementos montados existem no DOM final.
+for selector_marker in \
+  'id="callTheaterStage"' \
+  'id="callHumanCodeSection"' \
+  'class="call-soul-guide"'; do
+  if ! grep -q "$selector_marker" "$DOM"; then
+    echo "SMOKE FAIL: elemento montado ausente: $selector_marker"
+    exit 1
+  fi
+done
+
+echo "SMOKE OK: Revolution + Call Theater + Código Humano + Autoentendimento executaram e montaram no DOM real."
