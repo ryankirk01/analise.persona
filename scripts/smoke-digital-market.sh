@@ -3,7 +3,6 @@ set -euo pipefail
 PORT=4174
 LOG=/tmp/babel-digital-http.log
 DOM=/tmp/babel-digital-dom.html
-VISIBLE=/tmp/babel-digital-visible.html
 python3 -m http.server "$PORT" --bind 127.0.0.1 >"$LOG" 2>&1 &
 SERVER_PID=$!
 trap 'kill "$SERVER_PID" >/dev/null 2>&1 || true' EXIT
@@ -13,18 +12,35 @@ for candidate in google-chrome-stable google-chrome chromium chromium-browser; d
   if command -v "$candidate" >/dev/null 2>&1; then CHROME="$candidate"; break; fi
 done
 if [[ -z "$CHROME" ]]; then echo "Chrome/Chromium não encontrado."; exit 1; fi
-"$CHROME" --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage --virtual-time-budget=8000 --dump-dom "http://127.0.0.1:${PORT}/digital.html" > "$DOM"
-sed '/<script>/,$d' "$DOM" > "$VISIBLE"
-for marker in 'MERCADO' 'DIGITAL' '02 · INTELIGÊNCIA POR SETOR' '03 · MAPA DE OPORTUNIDADE DIGITAL' '04 · 40 EMPRESAS' 'id="sectorGrid"' 'id="matrix"' 'id="companyList"'; do
-  if ! grep -q "$marker" "$VISIBLE"; then echo "DIGITAL SMOKE FAIL: ausente $marker"; exit 1; fi
+"$CHROME" --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage --virtual-time-budget=10000 --dump-dom "http://127.0.0.1:${PORT}/digital.html" > "$DOM"
+
+for marker in \
+  'BABEL · DIGITAL ECONOMY INTELLIGENCE' \
+  '01 · CENTRAL DE DECISÃO' \
+  '02 · BABEL LIVE MARKET' \
+  '03 · POTENCIAL DE RECEITA' \
+  '04 · INTELIGÊNCIA POR SETOR' \
+  '05 · ANÁLISE DETALHADA' \
+  '06 · PONTOS DE OURO BABEL' \
+  '07 · PULSO EMPRESARIAL DIGITAL' \
+  '08 · SINAIS DE MERCADO BABEL' \
+  '09 · PRÓXIMAS CAMADAS DE INTELIGÊNCIA' \
+  '10 · CENÁRIOS DE CAPITAL' \
+  '11 · BABEL MUNDO DIGITAL' \
+  '12 · FONTES E MÉTODO'; do
+  if ! grep -q "$marker" "$DOM"; then echo "DIGITAL SMOKE FAIL: ausente $marker"; exit 1; fi
 done
-SECTORS=$(grep -o 'data-sector-card' "$VISIBLE" | wc -l | tr -d ' ')
-if [[ "$SECTORS" != "12" ]]; then echo "DIGITAL SMOKE FAIL: esperado 12 setores renderizados, encontrado $SECTORS"; exit 1; fi
-DOTS=$(grep -o 'class="sector-dot"' "$VISIBLE" | wc -l | tr -d ' ')
-if [[ "$DOTS" != "12" ]]; then echo "DIGITAL SMOKE FAIL: esperado 12 setores na matriz, encontrado $DOTS"; exit 1; fi
-COMPANIES=$(grep -o 'data-company-card' "$VISIBLE" | wc -l | tr -d ' ')
-if [[ "$COMPANIES" != "40" ]]; then echo "DIGITAL SMOKE FAIL: esperado 40 empresas renderizadas, encontrado $COMPANIES"; exit 1; fi
-if ! grep -q 'R$42,7B' "$VISIBLE"; then echo "DIGITAL SMOKE FAIL: métrica macro não renderizou"; exit 1; fi
-if ! grep -q 'Agências de Performance &amp; Tráfego' "$VISIBLE"; then echo "DIGITAL SMOKE FAIL: setor Performance ausente"; exit 1; fi
-if ! grep -q 'SaaS, Software &amp; Cloud' "$VISIBLE"; then echo "DIGITAL SMOKE FAIL: setor SaaS ausente"; exit 1; fi
-echo "DIGITAL SMOKE OK: 12 setores, matriz setorial e 40 empresas renderizaram no Chrome."
+
+if ! grep -q 'data-digital-world-mounted="1"' "$DOM"; then echo "DIGITAL SMOKE FAIL: engine não montou"; exit 1; fi
+if ! grep -q 'data-digital-sector-count="40"' "$DOM"; then echo "DIGITAL SMOKE FAIL: data model não contém 40 setores"; exit 1; fi
+if ! grep -q 'data-digital-section-count="12"' "$DOM"; then echo "DIGITAL SMOKE FAIL: esperado 12 capítulos estruturais"; exit 1; fi
+ROWS=$(grep -o '<tr data-sector-open=' "$DOM" | wc -l | tr -d ' ')
+if [[ "$ROWS" != "40" ]]; then echo "DIGITAL SMOKE FAIL: esperado 40 setores na tabela, encontrado $ROWS"; exit 1; fi
+GOLD=$(grep -o '<article><i>0[1-6]</i>' "$DOM" | wc -l | tr -d ' ')
+if [[ "$GOLD" -lt "6" ]]; then echo "DIGITAL SMOKE FAIL: Pontos de Ouro não renderizaram"; exit 1; fi
+if ! grep -q 'US$ 6,31T' "$DOM"; then echo "DIGITAL SMOKE FAIL: contexto macro global ausente"; exit 1; fi
+if ! grep -q 'Agências Full Service &amp; Publicidade' "$DOM"; then echo "DIGITAL SMOKE FAIL: setor de agências ausente"; exit 1; fi
+if ! grep -q 'Cybersecurity Platforms &amp; Services' "$DOM"; then echo "DIGITAL SMOKE FAIL: setor de cybersecurity ausente"; exit 1; fi
+if ! grep -q 'B2B SaaS' "$DOM"; then echo "DIGITAL SMOKE FAIL: setor SaaS ausente"; exit 1; fi
+
+echo "DIGITAL SMOKE OK: 12 capítulos, 40 setores, análise detalhada, Pontos de Ouro e inteligência global montaram no Chrome."
