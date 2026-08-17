@@ -1,0 +1,32 @@
+name: apply-night-sales-option
+
+on:
+  push:
+    paths:
+      - 'scripts/patch-night-sales.mjs'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Rebuild compressed page with night-sales intelligence
+        run: node scripts/patch-night-sales.mjs
+      - name: Commit generated page
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html v82-01.txt v82-02.txt v82-03.txt v82-04.txt v82-05.txt v82-06.txt
+          if git diff --cached --quiet; then
+            echo 'No generated changes.'
+            exit 0
+          fi
+          git commit -m 'feat: add night sales intelligence to sector analysis'
+          git push origin HEAD:main
