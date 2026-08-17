@@ -6,6 +6,9 @@ on:
       - 'scripts/patch-night-sales.mjs'
       - 'scripts/call-os-v2.fragment.html'
       - 'scripts/call-os-revolution.fragment.html'
+      - 'scripts/call-soul-theater.fragment.html'
+      - 'scripts/call-copy-v4.snippet.txt'
+      - 'scripts/upgrade-call-copy-v4.mjs'
       - '.github/workflows/apply-night-sales-option.yml'
 
 permissions:
@@ -13,23 +16,26 @@ permissions:
 
 jobs:
   patch:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Rebuild compressed page with Call Intelligence OS
+      - name: Apply canonical Call Copy V4
+        run: node scripts/upgrade-call-copy-v4.mjs
+      - name: Rebuild compressed page with Call Intelligence Soul OS
         run: node scripts/patch-night-sales.mjs
-      - name: Commit generated page
+      - name: Commit canonical source and generated page
         shell: bash
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add index.html v82-01.txt v82-02.txt v82-03.txt v82-04.txt v82-05.txt v82-06.txt
+          git add scripts/call-os-v2.fragment.html index.html v82-01.txt v82-02.txt v82-03.txt v82-04.txt v82-05.txt v82-06.txt
           if git diff --cached --quiet; then
             echo 'No generated changes.'
             exit 0
           fi
-          git commit -m 'feat: publish Babel Call Intelligence OS revolution'
+          git commit -m 'feat: publish Babel Call Intelligence Soul OS'
           git push origin HEAD:main
