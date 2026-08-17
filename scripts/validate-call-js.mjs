@@ -6,7 +6,8 @@ const files=[
   'scripts/call-os-revolution.fragment.html',
   'scripts/call-soul-theater.fragment.html',
   'scripts/call-thesis-os.fragment.html',
-  'scripts/call-focus-os.fragment.html'
+  'scripts/call-focus-os.fragment.html',
+  'scripts/call-ego-revolution.fragment.html'
 ];
 
 let failed=false;
