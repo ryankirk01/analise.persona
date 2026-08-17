@@ -5,7 +5,7 @@ on:
     paths:
       - 'scripts/patch-night-sales.mjs'
       - 'scripts/call-os-v2.fragment.html'
-      - 'scripts/upgrade-call-copy-v3.mjs'
+      - 'scripts/call-os-revolution.fragment.html'
       - '.github/workflows/apply-night-sales-option.yml'
 
 permissions:
@@ -18,20 +18,18 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Apply high-impact human Call Copy V3
-        run: node scripts/upgrade-call-copy-v3.mjs
-      - name: Rebuild compressed page with Call OS V3
+      - name: Rebuild compressed page with Call Intelligence OS
         run: node scripts/patch-night-sales.mjs
-      - name: Commit source and generated page
+      - name: Commit generated page
         shell: bash
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add scripts/call-os-v2.fragment.html index.html v82-01.txt v82-02.txt v82-03.txt v82-04.txt v82-05.txt v82-06.txt
+          git add index.html v82-01.txt v82-02.txt v82-03.txt v82-04.txt v82-05.txt v82-06.txt
           if git diff --cached --quiet; then
             echo 'No generated changes.'
             exit 0
           fi
-          git commit -m 'feat: publish Babel Call Copy V3 impact engine'
+          git commit -m 'feat: publish Babel Call Intelligence OS revolution'
           git push origin HEAD:main
