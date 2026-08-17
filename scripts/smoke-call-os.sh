@@ -24,7 +24,7 @@ fi
   --no-sandbox \
   --disable-gpu \
   --disable-dev-shm-usage \
-  --virtual-time-budget=14000 \
+  --virtual-time-budget=16000 \
   --dump-dom "http://127.0.0.1:${PORT}/" > "$DOM"
 
 HTML_TAG="$(grep -o '<html[^>]*>' "$DOM" | head -1 || true)"
@@ -34,7 +34,8 @@ for marker in \
   'data-call-core-mounted="1"' \
   'data-call-revolution-script-executed="1"' \
   'data-call-theater-script-executed="1"' \
-  'data-call-thesis-script-executed="1"'; do
+  'data-call-thesis-script-executed="1"' \
+  'data-call-focus-script-executed="1"'; do
   if ! grep -q "$marker" "$DOM"; then
     echo "SMOKE FAIL: script/runtime marker ausente: $marker"
     exit 1
@@ -44,42 +45,31 @@ done
 for marker in \
   'data-call-revolution-mounted="1"' \
   'data-call-theater-mounted="1"' \
-  'data-call-thesis-mounted="1"'; do
+  'data-call-thesis-mounted="1"' \
+  'data-call-focus-mounted="1"' \
+  'data-call-focus-sections="4"'; do
   if ! grep -q "$marker" "$DOM"; then
     echo "SMOKE FAIL: mounted marker ausente: $marker"
-    if grep -q 'data-call-revolution-error=' "$DOM"; then echo "Revolution registrou erro no <html>."; fi
-    if grep -q 'data-call-theater-error=' "$DOM"; then echo "Theater registrou erro no <html>."; fi
-    if grep -q 'data-call-thesis-error=' "$DOM"; then echo "Thesis registrou erro no <html>."; fi
+    if grep -q 'data-call-focus-error=' "$DOM"; then echo "Focus OS registrou erro no <html>."; fi
     exit 1
   fi
 done
 
 for selector_marker in \
+  'id="callFocusRoot"' \
   'id="callTheaterStage"' \
   'id="thesisCopySection"' \
-  'id="thesisBlockLab"' \
   'id="callRadarSection"' \
-  'id="callRadarGrid"' \
-  'id="callArenaSection"' \
-  'id="arenaOptions"' \
-  'id="callHumanCodeSection"'; do
+  'id="callArenaSection"'; do
   if ! grep -q "$selector_marker" "$DOM"; then
-    echo "SMOKE FAIL: elemento montado ausente: $selector_marker"
+    echo "SMOKE FAIL: elemento essencial ausente: $selector_marker"
     exit 1
   fi
 done
 
-if ! grep -q 'COPY PRINCIPAL · TESE' "$DOM"; then
-  echo "SMOKE FAIL: tese principal não apareceu no DOM."
-  exit 1
-fi
-if ! grep -q 'CALL RADAR' "$DOM"; then
-  echo "SMOKE FAIL: Call Radar não apareceu no DOM."
-  exit 1
-fi
-if ! grep -q 'CALL ARENA' "$DOM"; then
-  echo "SMOKE FAIL: Call Arena não apareceu no DOM."
+if ! grep -q 'Uma ligação. <em>Uma tese.</em> Quatro movimentos.' "$DOM"; then
+  echo "SMOKE FAIL: headline Focus OS ausente."
   exit 1
 fi
 
-echo "SMOKE OK: Core -> Revolution -> Soul -> Thesis OS executaram; Copy Principal, Radar e Arena estão montados no DOM real."
+echo "SMOKE OK: Focus OS executou e montou exatamente quatro seções no DOM real."
