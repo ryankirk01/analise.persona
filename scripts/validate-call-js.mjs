@@ -4,7 +4,8 @@ import vm from 'node:vm';
 const files=[
   'scripts/call-os-v2.fragment.html',
   'scripts/call-os-revolution.fragment.html',
-  'scripts/call-soul-theater.fragment.html'
+  'scripts/call-soul-theater.fragment.html',
+  'scripts/call-thesis-os.fragment.html'
 ];
 
 let failed=false;
