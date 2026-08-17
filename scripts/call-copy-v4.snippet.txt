@@ -1,0 +1,65 @@
+const makeVariants=(c,S,tone,intent,level)=>{
+const person=q('#callPerson')?.value.trim()||'';
+const now=new Date().getHours();
+const greeting=now<12?'Bom dia':now<18?'Boa tarde':'Boa noite';
+const company=c==='a empresa'?'a empresa':c;
+const sectorName=q('#callSector')?.value||'Negócios locais';
+const who=person?person:'senhor';
+const hello=person?`Olá, ${person}.`:'Perfeito.';
+const humanOpen={
+'Executivo':`${greeting}, tudo bem? Eu falo com um dos executivos da ${company}?`,
+'Natural':`${greeting}, tudo bem? Eu consigo falar com alguém que conheça bem a operação da ${company}?`,
+'Direto':`${greeting}. Eu falo com quem responde pela operação da ${company}?`,
+'Curioso':`${greeting}, tudo bem? Eu queria falar com alguém que consiga me responder uma coisa sobre a ${company}.`,
+'Provocador':`${greeting}. Quem aí dentro decide como a ${company} vai operar daqui para frente?`,
+'Minimalista':`${greeting}. Falo com um dos responsáveis pela ${company}?`
+}[tone]||`${greeting}, tudo bem? Eu falo com um dos executivos da ${company}?`;
+const permission={
+'Executivo':`${hello} Me chamo Ryan Kirk, sou um dos representantes da Babel. Eu só queria te fazer um simples questionamento.`,
+'Natural':`${hello} Aqui é o Ryan Kirk, da Babel. Eu prometo ser breve; eu só queria entender uma coisa com você.`,
+'Direto':`${hello} Ryan Kirk, da Babel. Vou ser objetivo e te fazer um único questionamento.`,
+'Curioso':`${hello} Meu nome é Ryan Kirk, sou da Babel. Eu fiquei com um questionamento um pouco diferente sobre vocês.`,
+'Provocador':`${hello} Ryan Kirk, da Babel. Não quero te apresentar nada agora; eu quero te deixar com um questionamento.`,
+'Minimalista':`${hello} Ryan Kirk, Babel. Um questionamento rápido.`
+}[tone]||`${hello} Me chamo Ryan Kirk, sou um dos representantes da Babel. Eu só queria te fazer um simples questionamento.`;
+const intensityBridge=level===3
+ ?`A Babel faz a empresa sair de uma operação que espera comando para uma estrutura que percebe o que está acontecendo, decide a próxima ação e age no momento em que a operação exige.`
+ :level===1
+ ?`A Babel começa tirando da equipe aquilo que o sistema já pode perceber, acompanhar e executar sozinho.`
+ :`A Babel transforma partes manuais ou semiautomáticas em uma operação que percebe o que precisa acontecer e executa a próxima ação sem depender de alguém lembrar.`;
+const sectorBridge=`No contexto de ${sectorName.toLowerCase()}, isso significa ${S.effect}.`;
+const intentClose={
+'Gerar curiosidade':`Eu queria te mostrar isso aplicado à ${company} sem apresentação longa. São no máximo 15 minutos. Para você é melhor hoje ou amanhã?`,
+'Conseguir reunião':`Eu consigo te mostrar isso aplicado à ${company} em no máximo 15 minutos. Para você funciona melhor hoje ou amanhã?`,
+'Descobrir manualidade':`Se eu mapear exatamente esse ponto da ${company} e te mostrar onde a operação pode agir sozinha, você prefere ver isso hoje ou amanhã?`,
+'Criar visão de futuro':`Eu queria te mostrar como esse cenário começaria na ${company}. São 15 minutos. Hoje ou amanhã fica melhor?`,
+'Falar com decisor':`Se fizer sentido para você, eu desenho isso em cima da ${company} em 15 minutos. É melhor hoje ou amanhã?`
+}[intent]||`Eu queria te mostrar isso aplicado à ${company} em no máximo 15 minutos. É melhor para você hoje ou amanhã?`;
+const pause='';
+return[
+{
+ name:'01 · QUESTIONAMENTO DE FUTURO',
+ why:'Baixa defesa → cria futuro mental → faz o decisor escolher a própria dor → conecta Babel a tempo e dinheiro',
+ text:`${humanOpen}\n\n${permission}\n\nCerto, ${who}: se você visse a ${company} trabalhando de forma automática e pensando por conta própria, qual seria a primeira coisa que você gostaria que ela resolvesse?\n\nPerfeito. É justamente esse tipo de resposta que importa. ${intensityBridge} ${sectorBridge} No fim, o nosso propósito é simples: fazer sobrar mais tempo para quem está no comando e impedir que dinheiro escape porque uma ação ficou para depois.\n\n${intentClose}`
+},
+{
+ name:'02 · A EMPRESA ACORDA SABENDO',
+ why:'Personifica a empresa → força uma cena mental concreta → transforma automação em autonomia operacional',
+ text:`${humanOpen}\n\n${hello} Aqui é o Ryan Kirk, da Babel. Eu vou te fazer um questionamento que parece estranho no começo, mas é bem simples.\n\nImagina que amanhã a ${company} acorde sabendo exatamente o que precisa fazer, sem ninguém lembrar ela de cada próxima tarefa. Qual decisão você gostaria que ela tomasse sozinha primeiro?\n\nEntendi. É exatamente essa mudança que a Babel constrói. ${sectorBridge} A diferença é que a empresa deixa de depender da memória da equipe para continuar avançando; ela começa a perceber contexto e agir no momento certo.\n\n${intentClose}`
+},
+{
+ name:'03 · O PONTO CEGO',
+ why:'Sai do discurso futurista → entra no processo real → faz o prospect revelar sozinho onde existe dependência humana',
+ text:`${humanOpen}\n\n${hello} Meu nome é Ryan Kirk, sou da Babel. Eu não quero te fazer uma apresentação; eu só queria validar uma coisa com você.\n\n${S.question}\n\nPerfeito. Eu pergunto porque esse é exatamente o tipo de ponto que normalmente fica invisível dentro da operação: todo mundo se acostuma a fazer manualmente e ninguém percebe quanto tempo e dinheiro aquilo consome. ${intensityBridge}\n\nSe eu desenhar esse ponto da ${company} para você e mostrar como eu tiraria essa dependência humana, são 15 minutos. Você prefere hoje ou amanhã?`
+},
+{
+ name:'04 · 30 DIAS SEM COMANDAR',
+ why:'Tira o dono da rotina mentalmente → revela dependência operacional → vende liberdade, não software',
+ text:`${humanOpen}\n\n${hello} Ryan Kirk, da Babel. Posso te fazer um questionamento bem direto?\n\nSe você passasse 30 dias sem precisar lembrar ninguém do que fazer, cobrar próxima ação ou conferir rotina, o que teria que mudar primeiro dentro da ${company} para isso ser possível?\n\nÉ exatamente aí que entra o nosso trabalho. ${sectorBridge} A Babel transforma o que hoje depende de comando em uma operação que acompanha, entende o próximo passo e age. O valor não está em ter mais uma ferramenta; está em você recuperar tempo e a empresa parar de perder dinheiro por atraso operacional.\n\nEu te mostro por onde isso começaria na ${company} em no máximo 15 minutos. Hoje ou amanhã fica melhor?`
+},
+{
+ name:'05 · CONSCIÊNCIA OPERACIONAL',
+ why:'Cria uma nova categoria mental → sobe acima de “automação” → posiciona Babel como capacidade de perceber, decidir e agir',
+ text:`${humanOpen}\n\n${hello} Me chamo Ryan Kirk, represento a Babel. Eu queria te deixar com um único questionamento.\n\nSe a ${company} conseguisse perceber um problema antes de você, entender o que aquilo significa e tomar a próxima ação sem esperar uma ordem, em qual parte da operação isso teria mais valor hoje?\n\nPerfeito. É isso que nós chamamos de consciência operacional. ${intensityBridge} ${sectorBridge} O objetivo não é substituir julgamento humano; é tirar das pessoas aquilo que não deveria depender da memória delas para acontecer.\n\n${intentClose}`
+}
+]};
