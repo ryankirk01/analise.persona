@@ -24,7 +24,7 @@ fi
   --no-sandbox \
   --disable-gpu \
   --disable-dev-shm-usage \
-  --virtual-time-budget=16000 \
+  --virtual-time-budget=18000 \
   --dump-dom "http://127.0.0.1:${PORT}/" > "$DOM"
 
 HTML_TAG="$(grep -o '<html[^>]*>' "$DOM" | head -1 || true)"
@@ -35,7 +35,8 @@ for marker in \
   'data-call-revolution-script-executed="1"' \
   'data-call-theater-script-executed="1"' \
   'data-call-thesis-script-executed="1"' \
-  'data-call-focus-script-executed="1"'; do
+  'data-call-focus-script-executed="1"' \
+  'data-call-ego-script-executed="1"'; do
   if ! grep -q "$marker" "$DOM"; then
     echo "SMOKE FAIL: script/runtime marker ausente: $marker"
     exit 1
@@ -47,17 +48,21 @@ for marker in \
   'data-call-theater-mounted="1"' \
   'data-call-thesis-mounted="1"' \
   'data-call-focus-mounted="1"' \
+  'data-call-ego-mounted="1"' \
   'data-call-focus-sections="4"'; do
   if ! grep -q "$marker" "$DOM"; then
     echo "SMOKE FAIL: mounted marker ausente: $marker"
     if grep -q 'data-call-focus-error=' "$DOM"; then echo "Focus OS registrou erro no <html>."; fi
+    if grep -q 'data-call-ego-error=' "$DOM"; then echo "Ego Revolution registrou erro no <html>."; fi
     exit 1
   fi
 done
 
 for selector_marker in \
   'id="callFocusRoot"' \
-  'id="callTheaterStage"' \
+  'id="callEgoRevolution"' \
+  'id="egoStage"' \
+  'id="egoQuestion"' \
   'id="thesisCopySection"' \
   'id="callRadarSection"' \
   'id="callArenaSection"'; do
@@ -67,9 +72,17 @@ for selector_marker in \
   fi
 done
 
+if ! grep -q '01 · A REVOLUÇÃO DO EGO' "$DOM"; then
+  echo "SMOKE FAIL: headline Ego Revolution ausente."
+  exit 1
+fi
+if ! grep -q 'Você está vivendo no nível do seu' "$DOM"; then
+  echo "SMOKE FAIL: primeiro confronto não renderizou."
+  exit 1
+fi
 if ! grep -q 'Uma ligação. <em>Uma tese.</em> Quatro movimentos.' "$DOM"; then
   echo "SMOKE FAIL: headline Focus OS ausente."
   exit 1
 fi
 
-echo "SMOKE OK: Focus OS executou e montou exatamente quatro seções no DOM real."
+echo "SMOKE OK: Focus OS mantém quatro seções e Ego Revolution montou no DOM real."
