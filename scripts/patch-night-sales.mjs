@@ -10,7 +10,6 @@ const buildVersion=String(process.env.GITHUB_SHA||Date.now().toString(36)).repla
 const b64=chunkFiles.map(f=>fs.readFileSync(f,'utf8').trim()).join('')+tailMatch[1];
 let html=zlib.gunzipSync(Buffer.from(b64,'base64')).toString('utf8');
 
-// Remove experiments anteriores e qualquer versão prévia do Call OS / intelligence layers / build stamp.
 html=html
   .replace(/<style id="nightSalesStyles">[\s\S]*?<\/style>/g,'')
   .replace(/<script id="nightSalesModule">[\s\S]*?<\/script>/g,'')
@@ -21,7 +20,8 @@ html=html
   .replace(/<style id="babelCallSoulStyles">[\s\S]*?<\/style>/g,'')
   .replace(/<script id="babelCallSoulModule">[\s\S]*?<\/script>/g,'')
   .replace(/<style id="babelBuildStampStyles">[\s\S]*?<\/style>/g,'')
-  .replace(/<script id="babelBuildStampModule">[\s\S]*?<\/script>/g,'');
+  .replace(/<script id="babelBuildStampModule">[\s\S]*?<\/script>/g,'')
+  .replace(/<script id="babelCallRuntimeGuard">[\s\S]*?<\/script>/g,'');
 
 const core=fs.readFileSync('scripts/call-os-v2.fragment.html','utf8');
 const revolution=fs.readFileSync('scripts/call-os-revolution.fragment.html','utf8');
@@ -30,9 +30,11 @@ if(!core.includes('babelCallOSModule')||!core.includes('babelCallOSStyles')) thr
 if(!revolution.includes('babelCallRevolutionModule')||!revolution.includes('babelCallRevolutionStyles')) throw new Error('Revolution Layer inválida.');
 if(!soul.includes('babelCallSoulModule')||!soul.includes('babelCallSoulStyles')) throw new Error('Human Intelligence / Call Theater Layer inválida.');
 
+const runtimeGuard=`<script id="babelCallRuntimeGuard">(()=>{document.documentElement.dataset.callRuntimeGuard='1';window.addEventListener('error',e=>{const msg=String(e.message||e.error?.message||'browser error').slice(0,180);document.documentElement.dataset.callGlobalError=msg;document.documentElement.dataset.callGlobalErrorSource=String(e.filename||'inline').slice(-80);document.documentElement.dataset.callGlobalErrorLine=String(e.lineno||0)});window.addEventListener('unhandledrejection',e=>{document.documentElement.dataset.callUnhandledRejection=String(e.reason?.message||e.reason||'rejection').slice(0,180)})})();</script>`;
+
 const stamp=`<style id="babelBuildStampStyles">#babelBuildStamp{display:inline-flex;align-items:center;gap:6px;margin-left:8px;padding:5px 8px;border:1px solid rgba(88,241,159,.18);border-radius:999px;background:rgba(88,241,159,.05);color:#79a98a;font:800 7px/1 Inter,system-ui;letter-spacing:.1em;text-transform:uppercase}#babelBuildStamp b{color:#baffd4}</style><script id="babelBuildStampModule">(()=>{const add=()=>{if(document.getElementById('babelBuildStamp'))return true;const host=document.querySelector('.call-brand,.call-top-title,.call-state');if(!host)return false;const el=document.createElement('span');el.id='babelBuildStamp';el.innerHTML='<b>SOUL V4</b> · BUILD ${buildVersion}';host.appendChild(el);return true};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{let n=0;const t=setInterval(()=>{if(add()||++n>60)clearInterval(t)},100)},{once:true});else{let n=0;const t=setInterval(()=>{if(add()||++n>60)clearInterval(t)},100)}})();</script>`;
 
-const fragment=core+'\n'+revolution+'\n'+soul+'\n'+stamp;
+const fragment=runtimeGuard+'\n'+core+'\n'+revolution+'\n'+soul+'\n'+stamp;
 html=html.replace('</body>',fragment+'\n</body>');
 
 const out=zlib.gzipSync(Buffer.from(html,'utf8'),{level:9}).toString('base64');
