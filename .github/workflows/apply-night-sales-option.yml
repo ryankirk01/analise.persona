@@ -10,6 +10,7 @@ on:
       - 'scripts/call-copy-v4.snippet.txt'
       - 'scripts/upgrade-call-copy-v4.mjs'
       - 'scripts/fix-call-late-mount.mjs'
+      - 'scripts/smoke-call-os.sh'
       - '.github/workflows/apply-night-sales-option.yml'
 
 permissions:
@@ -29,6 +30,8 @@ jobs:
         run: node scripts/fix-call-late-mount.mjs
       - name: Rebuild compressed page with Call Intelligence Soul OS
         run: node scripts/patch-night-sales.mjs
+      - name: Browser smoke test — Call Theater must actually render
+        run: bash scripts/smoke-call-os.sh
       - name: Commit canonical source and generated page
         shell: bash
         run: |
@@ -40,5 +43,5 @@ jobs:
             echo 'No generated changes.'
             exit 0
           fi
-          git commit -m 'fix: publish Call Theater with resilient late mount'
+          git commit -m 'fix: publish browser-verified Call Theater'
           git push origin HEAD:main
