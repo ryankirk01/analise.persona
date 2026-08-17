@@ -10,6 +10,7 @@ on:
       - 'scripts/call-thesis-os.fragment.html'
       - 'scripts/call-focus-os.fragment.html'
       - 'scripts/call-ego-revolution.fragment.html'
+      - 'scripts/call-radar-deep.fragment.html'
       - 'scripts/call-copy-v4.snippet.txt'
       - 'scripts/upgrade-call-copy-v4.mjs'
       - 'scripts/fix-call-late-mount.mjs'
@@ -34,9 +35,9 @@ jobs:
         run: node scripts/fix-call-late-mount.mjs
       - name: Validate all Call OS JavaScript syntax
         run: node scripts/validate-call-js.mjs
-      - name: Rebuild compressed page with Ego Focus OS
+      - name: Rebuild compressed page with Ego Focus and Deep Radar
         run: node scripts/patch-night-sales.mjs
-      - name: Browser smoke test — four sections and Ego Revolution must mount
+      - name: Browser smoke test — four sections, Ego and Deep Radar must mount
         run: bash scripts/smoke-call-os.sh
       - name: Commit canonical source and generated page
         shell: bash
@@ -44,10 +45,10 @@ jobs:
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add scripts/call-os-v2.fragment.html scripts/call-os-revolution.fragment.html scripts/call-soul-theater.fragment.html scripts/call-thesis-os.fragment.html scripts/call-focus-os.fragment.html scripts/call-ego-revolution.fragment.html index.html v82-01.txt v82-02.txt v82-03.txt v82-04.txt v82-05.txt v82-06.txt
+          git add scripts/call-os-v2.fragment.html scripts/call-os-revolution.fragment.html scripts/call-soul-theater.fragment.html scripts/call-thesis-os.fragment.html scripts/call-focus-os.fragment.html scripts/call-ego-revolution.fragment.html scripts/call-radar-deep.fragment.html index.html v82-01.txt v82-02.txt v82-03.txt v82-04.txt v82-05.txt v82-06.txt
           if git diff --cached --quiet; then
             echo 'No generated changes.'
             exit 0
           fi
-          git commit -m 'feat: publish Ego Revolution Call Focus OS'
+          git commit -m 'feat: publish deep digital physical Call Radar'
           git push origin HEAD:main
