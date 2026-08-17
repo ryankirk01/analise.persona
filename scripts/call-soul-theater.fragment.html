@@ -139,7 +139,39 @@ const annotateScripts=()=>{
  theater.dialogue=buildDialogue(theater.script);theater.turn=Math.min(theater.turn,Math.max(0,theater.dialogue.length-1));renderTheater();
 };
 const boot=()=>{
- let tries=0;const go=()=>{tries++;const ready=$('#callRevAutopilotSection')&&$('#callScripts');if(!ready){if(tries<60)setTimeout(go,100);return}mountTheater();humanSection();annotateScripts();const root=$('#callScripts');if(root){const obs=new MutationObserver(()=>{clearTimeout(root._soulTimer);root._soulTimer=setTimeout(annotateScripts,35)});obs.observe(root,{childList:true,subtree:true})}['callCompany','callPerson','callSector','callTone','callIntent','callIntensity'].forEach(id=>$('#'+id)?.addEventListener('change',()=>setTimeout(()=>{annotateScripts();theater.dialogue=buildDialogue(theater.script);theater.turn=0;renderTheater()},70)));$('#callGenerate')?.addEventListener('click',()=>setTimeout(annotateScripts,90))};go();
+ const initialize=()=>{
+  const ready=$('#callRevAutopilotSection')&&$('#callScripts');
+  if(!ready)return false;
+  mountTheater();humanSection();annotateScripts();
+  const root=$('#callScripts');
+  if(root&&!root.dataset.soulObserved){
+   root.dataset.soulObserved='1';
+   const scriptsObserver=new MutationObserver(()=>{
+    clearTimeout(root._soulTimer);
+    root._soulTimer=setTimeout(annotateScripts,35);
+   });
+   scriptsObserver.observe(root,{childList:true,subtree:true});
+  }
+  if(!document.documentElement.dataset.soulControlsBound){
+   document.documentElement.dataset.soulControlsBound='1';
+   ['callCompany','callPerson','callSector','callTone','callIntent','callIntensity'].forEach(id=>$('#'+id)?.addEventListener('change',()=>setTimeout(()=>{
+    annotateScripts();theater.dialogue=buildDialogue(theater.script);theater.turn=0;renderTheater();
+   },70)));
+   $('#callGenerate')?.addEventListener('click',()=>setTimeout(annotateScripts,90));
+  }
+  return true;
+ };
+ if(initialize())return;
+ let scheduled=false;
+ const observer=new MutationObserver(()=>{
+  if(scheduled)return;
+  scheduled=true;
+  requestAnimationFrame(()=>{
+   scheduled=false;
+   if(initialize())observer.disconnect();
+  });
+ });
+ observer.observe(document.documentElement,{childList:true,subtree:true});
 };
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,0),{once:true});else setTimeout(boot,0);
 })();
